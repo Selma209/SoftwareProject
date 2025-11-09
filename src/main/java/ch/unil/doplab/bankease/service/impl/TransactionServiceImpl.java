@@ -7,12 +7,12 @@ import ch.unil.doplab.bankease.dto.WithdrawRequest;
 import ch.unil.doplab.bankease.exception.ApiException;
 import ch.unil.doplab.bankease.service.TransactionService;
 import ch.unil.doplab.bankease.store.InMemoryStore;
-import org.springframework.stereotype.Service;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.List;
 import java.util.Map;
 
-@Service
+@ApplicationScoped
 public class TransactionServiceImpl implements TransactionService {
 
     private final InMemoryStore store;

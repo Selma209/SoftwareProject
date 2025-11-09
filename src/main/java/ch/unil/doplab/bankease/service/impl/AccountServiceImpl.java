@@ -5,12 +5,12 @@ import ch.unil.doplab.bankease.dto.CreateAccountRequest;
 import ch.unil.doplab.bankease.exception.ApiException;
 import ch.unil.doplab.bankease.service.AccountService;
 import ch.unil.doplab.bankease.store.InMemoryStore;
-import org.springframework.stereotype.Service;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.List;
 import java.util.Map;
 
-@Service
+@ApplicationScoped
 public class AccountServiceImpl implements AccountService {
 
     private final InMemoryStore store;

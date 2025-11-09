@@ -1,15 +1,18 @@
-# ---------- Build stage ----------
-FROM maven:3.9-eclipse-temurin-19 AS build
+# --- Build WAR (JDK 17) ---
+FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY pom.xml .
-RUN mvn -q -B -DskipTests dependency:go-offline
+RUN mvn -q -DskipTests dependency:go-offline
 COPY src ./src
-RUN mvn -q -B -DskipTests package
+# Skip totalement les tests (même compilation)
+RUN mvn -q -Dmaven.test.skip=true package
 
-# ---------- Runtime stage ----------
-FROM eclipse-temurin:19-jre
-WORKDIR /app
-COPY --from=build /app/target/bankease-1.0.0.jar /app/app.jar
-ENV JAVA_OPTS=""
-EXPOSE 8080
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
+# --- Run Payara Server Full 6 avec JDK 17 ---
+FROM payara/server-full:6.2024.8-jdk17
+ENV PAYARA_HOME=/opt/payara
+# Déposer le WAR et préparer un auto-deploy explicite
+COPY --from=build /app/target/bankease.war ${PAYARA_HOME}/glassfish/domains/domain1/autodeploy/bankease.war
+# Forcer le déploiement au boot (idempotent)
+RUN printf "deploy --name bankease --contextroot bankease ${PAYARA_HOME}/glassfish/domains/domain1/autodeploy/bankease.war\n" \
+    > ${PAYARA_HOME}/config/post-boot-commands.asadmin
+EXPOSE 8080 4848

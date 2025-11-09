@@ -1,12 +1,12 @@
 package ch.unil.doplab.bankease.store;
 
 import ch.unil.doplab.bankease.domain.*;
-import org.springframework.stereotype.Component;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
+@ApplicationScoped
 public class InMemoryStore {
     private final Map<String, Client> clients = new ConcurrentHashMap<>();
     private final Map<String, Employee> employees = new ConcurrentHashMap<>();

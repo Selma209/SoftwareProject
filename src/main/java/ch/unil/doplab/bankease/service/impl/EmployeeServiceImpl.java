@@ -6,12 +6,12 @@ import ch.unil.doplab.bankease.domain.TransactionStatus;
 import ch.unil.doplab.bankease.exception.ApiException;
 import ch.unil.doplab.bankease.service.EmployeeService;
 import ch.unil.doplab.bankease.store.InMemoryStore;
-import org.springframework.stereotype.Service;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.List;
 import java.util.Map;
 
-@Service
+@ApplicationScoped
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final InMemoryStore store;
