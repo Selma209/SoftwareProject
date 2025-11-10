@@ -1,12 +1,15 @@
 package com.bankease.boundary;
 
+import ch.unil.doplab.bankease.store.InMemoryStore;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
@@ -17,112 +20,162 @@ import java.util.Map;
 @Produces(MediaType.APPLICATION_JSON)
 public class TransactionResource {
 
-    // ------------------------------
-    // 🔹 POST /transactions/deposit
-    // ------------------------------
+    // --------- DEPOSIT ----------
     @POST
     @Path("/deposit")
     public Response deposit(Map<String, Object> body) {
+        String account = String.valueOf(body.get("accountNumber"));
+        if (!InMemoryStore.exists(account)) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(Map.of("error", "Account not found", "accountNumber", account))
+                    .build();
+        }
+        double amount = Double.parseDouble(body.get("amount").toString());
+        double newBalance = InMemoryStore.deposit(account, amount);
+
         return Response.ok(Map.of(
                 "status", "OK",
                 "op", "deposit",
-                "clientId", body.get("clientId"),
-                "accountNumber", body.get("accountNumber"),
-                "amount", body.get("amount"),
-                "description", body.get("description")
+                "accountNumber", account,
+                "amount", amount,
+                "newBalance", newBalance
         )).build();
     }
 
-    // ------------------------------
-    // 🔹 POST /transactions/withdraw
-    // ------------------------------
+    // --------- WITHDRAW ----------
     @POST
     @Path("/withdraw")
     public Response withdraw(Map<String, Object> body) {
+        String account = String.valueOf(body.get("accountNumber"));
+        if (!InMemoryStore.exists(account)) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(Map.of("error", "Account not found", "accountNumber", account))
+                    .build();
+        }
+        double amount = Double.parseDouble(body.get("amount").toString());
+        double current = InMemoryStore.get(account);
+
+        if (amount > current) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(Map.of(
+                            "status", "REFUSED",
+                            "reason", "Insufficient funds",
+                            "balance", current,
+                            "attemptedWithdraw", amount
+                    )).build();
+        }
+        InMemoryStore.withdraw(account, amount);
         return Response.ok(Map.of(
                 "status", "OK",
                 "op", "withdraw",
-                "clientId", body.get("clientId"),
-                "accountNumber", body.get("accountNumber"),
-                "amount", body.get("amount"),
-                "description", body.get("description")
+                "accountNumber", account,
+                "amount", amount,
+                "newBalance", InMemoryStore.get(account)
         )).build();
     }
 
-    // ------------------------------
-    // 🔹 POST /transactions/transfer
-    // ------------------------------
+    // --------- TRANSFER ----------
     @POST
     @Path("/transfer")
     public Response transfer(Map<String, Object> body) {
-        // Tolerate multiple key conventions
-        Object from = body.getOrDefault("fromAccount",
-                body.getOrDefault("sourceAccount", body.get("from")));
-        Object to   = body.getOrDefault("toAccount",
-                body.getOrDefault("destinationAccount", body.get("to")));
+        String from = String.valueOf(body.getOrDefault("fromAccount",
+                body.getOrDefault("sourceAccount", body.get("from"))));
+        String to = String.valueOf(body.getOrDefault("toAccount",
+                body.getOrDefault("destinationAccount", body.get("to"))));
+        double amount = Double.parseDouble(body.get("amount").toString());
+
+        if (!InMemoryStore.exists(from) || !InMemoryStore.exists(to)) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(Map.of("error", "Source or destination account not found"))
+                    .build();
+        }
+        double balanceFrom = InMemoryStore.get(from);
+        if (balanceFrom < amount) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(Map.of(
+                            "status", "REFUSED",
+                            "reason", "Insufficient funds in source account",
+                            "balance", balanceFrom
+                    )).build();
+        }
+        InMemoryStore.withdraw(from, amount);
+        InMemoryStore.deposit(to, amount);
 
         return Response.ok(Map.of(
                 "status", "OK",
                 "op", "transfer",
-                "clientId", body.get("clientId"),
                 "fromAccount", from,
                 "toAccount", to,
-                "amount", body.get("amount"),
-                "description", body.get("description")
+                "amount", amount,
+                "newBalanceFrom", InMemoryStore.get(from),
+                "newBalanceTo", InMemoryStore.get(to)
         )).build();
     }
 
-    // -------------------------------------------------------
-    // 🔹 NEW: GET /transactions/exchange/{currency}
-    // Calls a real external API: https://api.exchangerate.host
-    // -------------------------------------------------------
+    // --------- EXCHANGE (free plan: base EUR only) ----------
+    // Compute CHF->{CURRENCY} = (EUR->{CURRENCY}) / (EUR->CHF)
     @GET
     @Path("/exchange/{currency}")
     public Response getExchangeRate(@PathParam("currency") String currency) {
+        String target = currency.toUpperCase();
+        String accessKey = System.getenv().getOrDefault(
+                "EXCHANGERATES_API_KEY",
+                "988d5995c35fa0902752097116adf294"
+        );
+
+        String apiUrl = "https://api.exchangeratesapi.io/v1/latest"
+                + "?access_key=" + accessKey
+                + "&symbols=CHF," + target; // base=EUR on free plan
+
         try {
-            // External API endpoint (no API key required)
-            String apiUrl = "https://api.apilayer.com/exchangerates_data/latest?base=CHF&symbols="
-                    + currency.toUpperCase()
-                    + "xCZd3ALFLMKdpjDq6qgORAtq6qg9Dj9C";
-
-
-            // Make HTTP connection
-            URL url = new URL(apiUrl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            HttpURLConnection conn = (HttpURLConnection) new URL(apiUrl).openConnection();
             conn.setRequestMethod("GET");
             conn.connect();
 
-            // Handle non-200 responses
-            int status = conn.getResponseCode();
-            if (status != 200) {
-                return Response.status(Response.Status.BAD_GATEWAY)
-                        .entity(Map.of(
-                                "error", "External API call failed",
-                                "status", status))
-                        .build();
+            InputStream is = conn.getResponseCode() < 300
+                    ? conn.getInputStream()
+                    : conn.getErrorStream();
+
+            try (JsonReader jr = Json.createReader(is)) {
+                JsonObject root = jr.readObject();
+                if (root.containsKey("error")) {
+                    return Response.status(Response.Status.BAD_GATEWAY)
+                            .entity(Map.of("source", "https://api.exchangeratesapi.io/v1", "error", root.get("error")))
+                            .build();
+                }
+                JsonObject rates = root.getJsonObject("rates");
+                double eurToChf = rates.getJsonNumber("CHF").doubleValue();
+                double eurToTarget = rates.getJsonNumber(target).doubleValue();
+                double chfToTarget = eurToTarget / eurToChf;
+
+                return Response.ok(Map.of(
+                        "base", "CHF",
+                        "currency", target,
+                        "rate", chfToTarget,
+                        "explanation", "rate = (EUR→" + target + ") / (EUR→CHF)",
+                        "source", "https://api.exchangeratesapi.io/v1",
+                        "date", root.getString("date", "")
+                )).build();
             }
-
-            // Read JSON response from the API
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuilder jsonBuilder = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                jsonBuilder.append(line);
-            }
-            reader.close();
-
-            // Return result as JSON
-            return Response.ok(Map.of(
-                    "currency", currency.toUpperCase(),
-                    "source", "https://api.exchangerate.host",
-                    "data", jsonBuilder.toString()
-            )).build();
-
         } catch (Exception e) {
-            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(Map.of("error", e.getMessage()))
                     .build();
         }
+    }
+
+    // --------- BALANCE helper ----------
+    @GET
+    @Path("/balance/{account}")
+    public Response getBalance(@PathParam("account") String account) {
+        if (!InMemoryStore.exists(account)) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(Map.of("error", "Account not found", "accountNumber", account))
+                    .build();
+        }
+        return Response.ok(Map.of(
+                "accountNumber", account,
+                "balance", InMemoryStore.get(account)
+        )).build();
     }
 }
