@@ -6,6 +6,7 @@ import ch.unil.doplab.bankease.exception.ApiException;
 import ch.unil.doplab.bankease.service.AccountService;
 import ch.unil.doplab.bankease.store.InMemoryStore;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ public class AccountServiceImpl implements AccountService {
 
     private final InMemoryStore store;
 
+    @Inject
     public AccountServiceImpl(InMemoryStore store) {
         this.store = store;
     }

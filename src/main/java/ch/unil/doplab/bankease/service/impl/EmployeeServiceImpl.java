@@ -7,7 +7,7 @@ import ch.unil.doplab.bankease.exception.ApiException;
 import ch.unil.doplab.bankease.service.EmployeeService;
 import ch.unil.doplab.bankease.store.InMemoryStore;
 import jakarta.enterprise.context.ApplicationScoped;
-
+import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +16,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final InMemoryStore store;
 
+    @Inject
     public EmployeeServiceImpl(InMemoryStore store) {
         this.store = store;
     }
