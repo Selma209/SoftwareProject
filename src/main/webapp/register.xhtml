@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+    <title>Créer un compte BankEase</title>
+    <h:outputStylesheet library="css" name="bankease.css"/>
+</h:head>
+
+<h:body styleClass="be-body">
+    <div class="be-login-container">
+        <div class="be-card">
+            <h1 class="be-title">Créer un compte BankEase</h1>
+
+            <h:form>
+                <h:panelGroup styleClass="be-field">
+                    <h:outputLabel for="username" value="Nom d'utilisateur"/>
+                    <h:inputText id="username"
+                                 value="#{createClientBean.username}"
+                                 styleClass="be-input"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="be-field">
+                    <h:outputLabel for="password" value="Mot de passe"/>
+                    <h:inputSecret id="password"
+                                   value="#{createClientBean.password}"
+                                   styleClass="be-input"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="be-field">
+                    <h:outputLabel for="firstName" value="Prénom"/>
+                    <h:inputText id="firstName"
+                                 value="#{createClientBean.firstName}"
+                                 styleClass="be-input"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="be-field">
+                    <h:outputLabel for="lastName" value="Nom"/>
+                    <h:inputText id="lastName"
+                                 value="#{createClientBean.lastName}"
+                                 styleClass="be-input"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="be-field">
+                    <h:outputLabel for="email" value="Email"/>
+                    <h:inputText id="email"
+                                 value="#{createClientBean.email}"
+                                 styleClass="be-input"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="be-field">
+                    <h:outputLabel for="phone" value="Téléphone"/>
+                    <h:inputText id="phone"
+                                 value="#{createClientBean.phoneNumber}"
+                                 styleClass="be-input"/>
+                </h:panelGroup>
+
+                <h:commandButton value="Créer mon compte"
+                                 action="#{createClientBean.register}"
+                                 styleClass="be-button"/>
+
+                <h:messages styleClass="be-messages" globalOnly="true"/>
+
+                <div class="be-register-link">
+                    Déjà un compte ?
+                    <h:link outcome="index" value="Se connecter"/>
+                </div>
+            </h:form>
+        </div>
+    </div>
+</h:body>
+</html>

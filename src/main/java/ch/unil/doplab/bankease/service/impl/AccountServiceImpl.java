@@ -7,11 +7,13 @@ import ch.unil.doplab.bankease.service.AccountService;
 import ch.unil.doplab.bankease.store.InMemoryStore;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import java.util.List;
 import java.util.Map;
 
 @ApplicationScoped
+@Named("accountService")
 public class AccountServiceImpl implements AccountService {
 
     private final InMemoryStore store;

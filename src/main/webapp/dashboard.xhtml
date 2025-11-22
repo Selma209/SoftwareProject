@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+    <title>Tableau de bord - BankEase</title>
+    <h:outputStylesheet library="css" name="bankease.css"/>
+</h:head>
+
+<h:body styleClass="be-body">
+    <div class="be-dashboard">
+        <div class="be-navbar">
+            <div class="be-navbar-title">BankEase</div>
+            <div class="be-navbar-right">
+                <span class="be-navbar-user">
+                    Connecté en tant que #{loginBean.username}
+                </span>
+                <h:form styleClass="be-logout-form">
+                    <h:commandLink value="Se déconnecter"
+                                   action="#{loginBean.logout}"/>
+                </h:form>
+            </div>
+        </div>
+
+        <div class="be-dashboard-content">
+            <h2>Vos comptes</h2>
+
+            <h:dataTable value="#{accountViewBean.accounts}" var="acc"
+                         styleClass="be-table"
+                         headerClass="be-table-header"
+                         rowClasses="be-table-row">
+                <h:column>
+                    <f:facet name="header">Numéro</f:facet>
+                    #{acc['accountNumber']}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Type</f:facet>
+                    #{acc['type']}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Solde</f:facet>
+                    #{acc['balance']}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Ouvert le</f:facet>
+                    #{acc['openingDate']}
+                </h:column>
+            </h:dataTable>
+
+            <h3 style="margin-top: 2rem;">Total</h3>
+            <h:outputText value="#{accountViewBean.summary['totalBalance']} CHF"/>
+        </div>
+    </div>
+</h:body>
+</html>

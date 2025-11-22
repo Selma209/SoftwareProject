@@ -63,6 +63,12 @@ public class InMemoryStore {
         return balances.getOrDefault(accountNumber, 0.0);
     }
 
+    public void addClient(Client client) {
+        clients.put(client.getUsername(), client); // stocké par username
+        clientByUsername.put(client.getUsername(), client.getUsername());
+    }
+
+
     public double depositBalance(String accountNumber, double amount) {
         ensureAccountBalance(accountNumber);
         return balances.merge(accountNumber, amount, Double::sum);

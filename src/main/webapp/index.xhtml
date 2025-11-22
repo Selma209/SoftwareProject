@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+    <title>Connexion à BankEase</title>
+    <h:outputStylesheet library="css" name="bankease.css"/>
+</h:head>
+
+<h:body styleClass="be-body">
+    <div class="be-login-container">
+        <div class="be-card">
+            <h1 class="be-title">Connexion à BankEase</h1>
+
+            <h:form>
+                <h:panelGroup styleClass="be-field">
+                    <h:outputLabel for="username" value="Nom d'utilisateur"/>
+                    <h:inputText id="username"
+                                 value="#{loginBean.username}"
+                                 styleClass="be-input"/>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="be-field">
+                    <h:outputLabel for="password" value="Mot de passe"/>
+                    <h:inputSecret id="password"
+                                   value="#{loginBean.password}"
+                                   styleClass="be-input"/>
+                </h:panelGroup>
+
+                <h:commandButton value="Se connecter"
+                                 action="#{loginBean.login}"
+                                 styleClass="be-button"/>
+
+                <h:messages styleClass="be-messages" globalOnly="true"/>
+
+                <div class="be-register-link">
+                    Pas encore de compte ?
+                    <h:link outcome="register" value="Créer un compte"/>
+                </div>
+            </h:form>
+        </div>
+    </div>
+</h:body>
+</html>

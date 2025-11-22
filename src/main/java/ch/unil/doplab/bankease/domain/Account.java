@@ -23,7 +23,7 @@ public class Account {
         this.openingDate = LocalDate.now();
     }
 
-    void receiveDeposit(BigDecimal amount) {
+    public void receiveDeposit(BigDecimal amount) {
         validateAmount(amount);
         balance = balance.add(amount);
     }
