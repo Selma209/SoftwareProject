@@ -21,7 +21,7 @@ public class LoginBean implements Serializable {
     @Inject
     private ClientService clientService;
 
-    // ====== Getters / Setters ======
+    // === GETTERS / SETTERS ===
 
     public String getUsername() {
         return username;
@@ -43,27 +43,41 @@ public class LoginBean implements Serializable {
         return loggedClient;
     }
 
-    public boolean isLogged() {
-        return loggedClient != null;
+    public void setLoggedClient(Client loggedClient) {
+        this.loggedClient = loggedClient;
     }
 
-    public String getClientId() {
-        return (loggedClient != null) ? loggedClient.getUsername() : null;
-    }
-
-    // ====== Actions ======
+    // === ACTION: LOGIN ===
 
     public String login() {
+        FacesContext ctx = FacesContext.getCurrentInstance();
+
+        // Vérification des champs vides
+        if (username == null || username.isBlank() ||
+                password == null || password.isBlank()) {
+
+            ctx.addMessage(null, new FacesMessage(
+                    FacesMessage.SEVERITY_ERROR,
+                    "Username or password missing",
+                    "Please fill in both fields."
+            ));
+            return null; // reste sur la page de login
+        }
+
         Client c = clientService.validateLogin(username, password);
+
         if (c == null) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Invalid username or password", null));
+            ctx.addMessage(null, new FacesMessage(
+                    FacesMessage.SEVERITY_ERROR,
+                    "Invalid username or password",
+                    "Please check your credentials."
+            ));
             return null;
         }
 
+
         loggedClient = c;
-        password = null; // on efface le mdp en mémoire
+        password = null;
 
         return "dashboard?faces-redirect=true";
     }

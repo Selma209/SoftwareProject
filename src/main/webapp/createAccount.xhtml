@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Ouvrir un compte - BankEase</title>
+    <h:outputStylesheet library="css" name="bankease.css"/>
+</h:head>
+
+<h:body class="be-body">
+
+    <!-- NAVBAR -->
+    <div class="be-navbar">
+        <div class="be-navbar-title">BankEase</div>
+        <div class="be-navbar-right">
+            <span class="be-navbar-user">
+                Bonjour, #{loginBean.loggedClient.firstName}
+            </span>
+            <h:form class="be-logout-form">
+                <h:commandLink value="Se déconnecter" action="#{loginBean.logout}"/>
+            </h:form>
+        </div>
+    </div>
+
+    <!-- MAIN CARD -->
+    <div class="be-dashboard">
+        <div class="be-dashboard-content">
+
+            <h2>Ouvrir un nouveau compte</h2>
+
+            <p:card>
+
+                <h:form>
+
+                    <div class="be-field">
+                        <label for="type">Type de compte</label>
+                        <p:selectOneMenu id="type"
+                                         value="#{createAccountBean.type}"
+                                         styleClass="be-input"
+                                         required="true"
+                                         requiredMessage="Veuillez choisir un type de compte">
+                            <f:selectItem itemLabel="Sélectionner..." itemValue="" noSelectionOption="true"/>
+
+
+                            <f:selectItem itemLabel="Compte courant" itemValue="CURRENT"/>
+                            <f:selectItem itemLabel="Compte épargne" itemValue="SAVINGS"/>
+                            <f:selectItem itemLabel="Compte épargne" itemValue="BUSINESS"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <p:commandButton value="Ouvrir le compte"
+                                     action="#{createAccountBean.open}"
+                                     ajax="false"
+                                     styleClass="be-button"/>
+
+
+                    <h:link outcome="dashboard"
+                            value="Retour au dashboard"
+                            style="margin-left: 8px;"/>
+
+                    <p:messages showSummary="true"
+                                showDetail="false"
+                                styleClass="be-messages"/>
+
+                </h:form>
+
+            </p:card>
+
+        </div>
+    </div>
+
+</h:body>
+</html>

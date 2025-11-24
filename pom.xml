@@ -23,8 +23,15 @@
       <version>10.0.0</version>
       <scope>provided</scope>
     </dependency>
+      <dependency>
+          <groupId>org.primefaces</groupId>
+          <artifactId>primefaces</artifactId>
+          <version>14.0.5</version>
+          <classifier>jakarta</classifier>
+      </dependency>
 
-    <!-- (Optionnel) JSON-B / JSON-P sont déjà fournis par Payara -->
+
+      <!-- (Optionnel) JSON-B / JSON-P sont déjà fournis par Payara -->
   </dependencies>
 
   <build>

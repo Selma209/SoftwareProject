@@ -1,6 +1,7 @@
 package ch.unil.doplab.bankease.store;
 
 import ch.unil.doplab.bankease.domain.Account;
+import ch.unil.doplab.bankease.domain.AccountType;
 import ch.unil.doplab.bankease.domain.Client;
 import ch.unil.doplab.bankease.domain.Employee;
 import ch.unil.doplab.bankease.domain.Transaction;
@@ -44,13 +45,43 @@ public class InMemoryStore {
     private static final InMemoryStore INSTANCE = new InMemoryStore();
 
     public InMemoryStore() {
-        // Seed de démo (optionnel)
+        // Seed de soldes de démo (historique)
         balances.putIfAbsent("ACC-001", 1000.0);
         balances.putIfAbsent("ACC-002", 500.0);
         balances.putIfAbsent("ACC-003", 0.0);
+
+
+        Client john = new Client(
+                "john",       // username
+                "1234",               // password
+                "John",              // firstName
+                "Doe",               // lastName
+                "john@example.com",  // email
+                "123456789"         // phone
+
+        );
+        addClient(john);
+
+        Account johnAcc = john.openAccount(AccountType.CURRENT);
+        accounts.put(johnAcc.getAccountNumber(), johnAcc);
+        balances.put(johnAcc.getAccountNumber(), 500.0); // solde initial
+
+        Client mary = new Client(
+                "mary",
+                "abcd",
+                "Mary",
+                "Smith",
+                "mary@example.com",
+                "987654321"
+        );
+        addClient(mary);
+
+        Account maryAcc = mary.openAccount(AccountType.SAVINGS);
+        accounts.put(maryAcc.getAccountNumber(), maryAcc);
+        balances.put(maryAcc.getAccountNumber(), 1200.0); // solde initial
     }
 
-    // ----- Méthodes d'instance pour les soldes (si tu veux injecter le store) -----
+    // ----- Méthodes d'instance pour les soldes -----
     public void ensureAccountBalance(String accountNumber) {
         balances.putIfAbsent(accountNumber, 0.0);
     }
@@ -64,10 +95,10 @@ public class InMemoryStore {
     }
 
     public void addClient(Client client) {
+        // ici tu stockais par username, je respecte ton choix
         clients.put(client.getUsername(), client); // stocké par username
         clientByUsername.put(client.getUsername(), client.getUsername());
     }
-
 
     public double depositBalance(String accountNumber, double amount) {
         ensureAccountBalance(accountNumber);

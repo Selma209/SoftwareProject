@@ -34,6 +34,7 @@ public class ClientServiceImpl implements ClientService {
             throw new ApiException(400, "Username already exists");
         }
 
+
         Client client = new Client(
                 username,
                 password,
@@ -43,7 +44,7 @@ public class ClientServiceImpl implements ClientService {
                 phoneNumber
         );
 
-        // on stocke le client en mémoire
+        // Store client
         store.clients().put(username, client);
 
         return client;

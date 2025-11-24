@@ -1,59 +1,116 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 
 <h:head>
-    <title>Tableau de bord - BankEase</title>
+    <title>Dashboard - BankEase</title>
     <h:outputStylesheet library="css" name="bankease.css"/>
 </h:head>
 
-<h:body styleClass="be-body">
-    <div class="be-dashboard">
-        <div class="be-navbar">
-            <div class="be-navbar-title">BankEase</div>
-            <div class="be-navbar-right">
-                <span class="be-navbar-user">
-                    Connecté en tant que #{loginBean.username}
-                </span>
-                <h:form styleClass="be-logout-form">
-                    <h:commandLink value="Se déconnecter"
-                                   action="#{loginBean.logout}"/>
-                </h:form>
-            </div>
-        </div>
+<h:body class="be-body">
 
-        <div class="be-dashboard-content">
-            <h2>Vos comptes</h2>
+    <div class="be-navbar">
+        <div class="be-navbar-title">BankEase</div>
 
-            <h:dataTable value="#{accountViewBean.accounts}" var="acc"
-                         styleClass="be-table"
-                         headerClass="be-table-header"
-                         rowClasses="be-table-row">
-                <h:column>
-                    <f:facet name="header">Numéro</f:facet>
-                    #{acc['accountNumber']}
-                </h:column>
-                <h:column>
-                    <f:facet name="header">Type</f:facet>
-                    #{acc['type']}
-                </h:column>
-                <h:column>
-                    <f:facet name="header">Solde</f:facet>
-                    #{acc['balance']}
-                </h:column>
-                <h:column>
-                    <f:facet name="header">Ouvert le</f:facet>
-                    #{acc['openingDate']}
-                </h:column>
-            </h:dataTable>
+        <div class="be-navbar-right">
+            <span class="be-navbar-user">
+                Bonjour, #{loginBean.loggedClient.firstName}
+            </span>
 
-            <h3 style="margin-top: 2rem;">Total</h3>
-            <h:outputText value="#{accountViewBean.summary['totalBalance']} CHF"/>
+            <h:form styleClass="be-logout-form">
+                <h:commandLink value="Se déconnecter" action="#{loginBean.logout}"/>
+            </h:form>
         </div>
     </div>
+
+    <!-- DASHBOARD CARD -->
+    <div class="be-dashboard">
+        <div class="be-dashboard-content">
+
+            <!-- SUMMARY -->
+            <h2>Résumé</h2>
+
+            <div class="be-cards-container">
+
+                <p:card styleClass="be-card-summary">
+                    <h3>Total Balance</h3>
+                    <p class="value">#{accountViewBean.summary.totalBalance} CHF</p>
+                </p:card>
+
+                <p:card styleClass="be-card-summary">
+                    <h3>Nombre de comptes</h3>
+                    <p class="value">#{accountViewBean.accounts.size()}</p>
+                </p:card>
+
+                <p:card styleClass="be-card-summary">
+                    <h3>Dernière transaction</h3>
+                    <p class="value">Non disponible</p>
+                </p:card>
+
+            </div>
+
+            <!-- ACCOUNTS TABLE -->
+            <h2 style="margin-top: 30px;">Vos comptes</h2>
+
+            <p:commandButton value="Ouvrir un compte"
+                             outcome="createAccount"
+                             icon="pi pi-plus"
+                             styleClass="be-button"
+                             style="margin-bottom: 15px;"/>
+
+
+            <p:dataTable value="#{accountViewBean.accounts}"
+                         var="acc"
+                         styleClass="be-table"
+                         paginator="false"
+                         responsiveLayout="scroll">
+
+                <p:column headerText="Numéro du compte">
+                    #{acc['accountNumber']}
+                </p:column>
+
+                <p:column headerText="Type">
+                    #{acc['type']}
+                </p:column>
+
+                <p:column headerText="Solde">
+                    #{acc['balance']} CHF
+                </p:column>
+
+                <p:column headerText="Ouvert le">
+                    #{acc['openingDate']}
+                </p:column>
+
+                <p:column headerText="Actions">
+                    <h:form styleClass="be-actions-form">
+
+                        <p:commandButton value="Dépôt"
+                                         styleClass="be-button-small"
+                                         action="deposit?faces-redirect=true">
+                            <f:setPropertyActionListener
+                                    target="#{transactionBean.accountNumber}"
+                                    value="#{acc['accountNumber']}"/>
+                        </p:commandButton>
+
+                        <p:commandButton value="Virement"
+                                         styleClass="be-button-secondary"
+                                         action="transfer?faces-redirect=true">
+                            <f:setPropertyActionListener
+                                    target="#{transactionBean.sourceAccountNumber}"
+                                    value="#{acc['accountNumber']}"/>
+                        </p:commandButton>
+
+                    </h:form>
+                </p:column>
+
+            </p:dataTable>
+
+        </div>
+    </div>
+
 </h:body>
 </html>
