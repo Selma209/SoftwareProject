@@ -35,7 +35,7 @@ public class CreateAccountBean implements Serializable {
 
     public String open() {
         try {
-            String clientId = loginBean.getLoggedClient().getId();
+            String clientId = loginBean.getLoggedClient().getUsername();
             CreateAccountRequest req = new CreateAccountRequest(clientId, type);
             accountService.openAccount(clientId, req);
             FacesContext.getCurrentInstance().addMessage(null,
