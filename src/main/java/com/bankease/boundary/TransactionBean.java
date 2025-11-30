@@ -5,6 +5,7 @@ import ch.unil.doplab.bankease.dto.TransferRequest;
 import ch.unil.doplab.bankease.exception.ApiException;
 import ch.unil.doplab.bankease.service.TransactionService;
 import ch.unil.doplab.bankease.domain.Client;
+
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -25,107 +26,62 @@ public class TransactionBean implements Serializable {
     @Inject
     private LoginBean loginBean;
 
-    private String accountNumber;
-    private String sourceAccountNumber;
+    private String accountNumber;          // pour dépôt
+    private String sourceAccountNumber;    // pour virement
     private String destinationAccountNumber;
     private BigDecimal amount;
     private String description;
 
-    public String getAccountNumber() {
-        return accountNumber;
-    }
+    // getters/setters obligatoires
+    public String getAccountNumber() { return accountNumber; }
+    public void setAccountNumber(String accountNumber) { this.accountNumber = accountNumber; }
 
-    public void setAccountNumber(String accountNumber) {
-        this.accountNumber = accountNumber;
-    }
+    public String getSourceAccountNumber() { return sourceAccountNumber; }
+    public void setSourceAccountNumber(String sourceAccountNumber) { this.sourceAccountNumber = sourceAccountNumber; }
 
-    public String getSourceAccountNumber() {
-        return sourceAccountNumber;
-    }
+    public String getDestinationAccountNumber() { return destinationAccountNumber; }
+    public void setDestinationAccountNumber(String destinationAccountNumber) { this.destinationAccountNumber = destinationAccountNumber; }
 
-    public void setSourceAccountNumber(String sourceAccountNumber) {
-        this.sourceAccountNumber = sourceAccountNumber;
-    }
+    public BigDecimal getAmount() { return amount; }
+    public void setAmount(BigDecimal amount) { this.amount = amount; }
 
-    public String getDestinationAccountNumber() {
-        return destinationAccountNumber;
-    }
-
-    public void setDestinationAccountNumber(String destinationAccountNumber) {
-        this.destinationAccountNumber = destinationAccountNumber;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
 
-    private Client getLoggedClientOrNull() {
-        return loginBean.getLoggedClient();
-    }
-
-    private String getLoggedClientId() {
-        Client c = getLoggedClientOrNull();
+    private String getClientId() {
+        Client c = loginBean.getLoggedClient();
         return (c != null) ? c.getUsername() : null;
     }
 
-
+    // === DÉPÔT ===
     public String makeDeposit() {
-        String clientId = getLoggedClientId();
-        if (clientId == null) {
-            addMessage(FacesMessage.SEVERITY_ERROR, "Session expirée", "Veuillez vous reconnecter.");
-            return "index?faces-redirect=true";
-        }
-
         try {
+            String clientId = getClientId();
+
             DepositRequest req = new DepositRequest(
                     clientId,
                     accountNumber,
                     amount,
                     description
             );
-            Map<String, Object> result = transactionService.deposit(req);
 
-            addMessage(FacesMessage.SEVERITY_INFO,
-                    "Dépôt réussi",
-                    "Nouveau solde : " + result.get("balance") + " CHF");
+            transactionService.deposit(req);
 
-            // retour au dashboard pour voir le solde mis à jour
+            addInfo("Dépôt réussi");
             return "dashboard?faces-redirect=true";
 
         } catch (ApiException ex) {
-            addMessage(FacesMessage.SEVERITY_ERROR,
-                    "Erreur (" + ex.getStatus() + ")",
-                    ex.getMessage());
-            return null;
-        } catch (Exception ex) {
-            addMessage(FacesMessage.SEVERITY_ERROR,
-                    "Erreur inattendue",
-                    ex.getMessage());
+            addError(ex.getMessage());
             return null;
         }
     }
 
+    // === VIREMENT ===
     public String makeTransfer() {
-        String clientId = getLoggedClientId();
-        if (clientId == null) {
-            addMessage(FacesMessage.SEVERITY_ERROR, "Session expirée", "Veuillez vous reconnecter.");
-            return "index?faces-redirect=true";
-        }
-
         try {
+            String clientId = getClientId();
+
             TransferRequest req = new TransferRequest(
                     clientId,
                     sourceAccountNumber,
@@ -133,29 +89,25 @@ public class TransactionBean implements Serializable {
                     amount,
                     description
             );
-            Map<String, Object> result = transactionService.transfer(req);
 
-            addMessage(FacesMessage.SEVERITY_INFO,
-                    "Virement réussi",
-                    "Transaction : " + result.get("id"));
+            transactionService.transfer(req);
 
+            addInfo("Virement effectué");
             return "dashboard?faces-redirect=true";
 
         } catch (ApiException ex) {
-            addMessage(FacesMessage.SEVERITY_ERROR,
-                    "Erreur (" + ex.getStatus() + ")",
-                    ex.getMessage());
-            return null;
-        } catch (Exception ex) {
-            addMessage(FacesMessage.SEVERITY_ERROR,
-                    "Erreur inattendue",
-                    ex.getMessage());
+            addError(ex.getMessage());
             return null;
         }
     }
 
-    private void addMessage(FacesMessage.Severity severity, String summary, String detail) {
+    private void addInfo(String msg) {
         FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(severity, summary, detail));
+                new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null));
+    }
+
+    private void addError(String msg) {
+        FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
     }
 }

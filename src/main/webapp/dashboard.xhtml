@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
 <h:head>
     <title>Dashboard - BankEase</title>
@@ -17,97 +17,45 @@
         <div class="be-navbar-title">BankEase</div>
 
         <div class="be-navbar-right">
-            <span class="be-navbar-user">
-                Bonjour, #{loginBean.loggedClient.firstName}
-            </span>
-
-            <h:form styleClass="be-logout-form">
-                <h:commandLink value="Se déconnecter" action="#{loginBean.logout}"/>
+            Bonjour, #{loginBean.loggedClient.firstName}
+            <h:form style="display:inline">
+                <p:commandLink value="Déconnexion" action="#{loginBean.logout}"/>
             </h:form>
         </div>
     </div>
 
-    <!-- DASHBOARD CARD -->
     <div class="be-dashboard">
         <div class="be-dashboard-content">
 
-            <!-- SUMMARY -->
-            <h2>Résumé</h2>
+            <h2>Vos comptes</h2>
 
-            <div class="be-cards-container">
+            <ui:repeat value="#{accountViewBean.accounts}" var="acc">
 
-                <p:card styleClass="be-card-summary">
-                    <h3>Total Balance</h3>
-                    <p class="value">#{accountViewBean.summary.totalBalance} CHF</p>
+                <p:card style="margin-bottom:20px">
+
+                    <h3>Compte : #{acc['accountNumber']}</h3>
+                    <p>Type : #{acc['type']}</p>
+                    <p>Solde : #{acc['balance']} CHF</p>
+
+                    <div class="be-actions">
+
+                        <!-- DÉPÔT -->
+                        <h:link outcome="deposit" value="Dépôt" styleClass="be-button-small">
+                            <f:param name="acc" value="#{acc['accountNumber']}"/>
+                        </h:link>
+
+                        <!-- VIREMENT -->
+                        <h:link outcome="transfer" value="Virement" styleClass="be-button-secondary">
+                            <f:param name="src" value="#{acc['accountNumber']}"/>
+                        </h:link>
+
+                    </div>
+
                 </p:card>
 
-                <p:card styleClass="be-card-summary">
-                    <h3>Nombre de comptes</h3>
-                    <p class="value">#{accountViewBean.accounts.size()}</p>
-                </p:card>
+            </ui:repeat>
 
-                <p:card styleClass="be-card-summary">
-                    <h3>Dernière transaction</h3>
-                    <p class="value">Non disponible</p>
-                </p:card>
-
-            </div>
-
-            <!-- ACCOUNTS TABLE -->
-            <h2 style="margin-top: 30px;">Vos comptes</h2>
-
-            <p:commandButton value="Ouvrir un compte"
-                             outcome="createAccount"
-                             icon="pi pi-plus"
-                             styleClass="be-button"
-                             style="margin-bottom: 15px;"/>
-
-
-            <p:dataTable value="#{accountViewBean.accounts}"
-                         var="acc"
-                         styleClass="be-table"
-                         paginator="false"
-                         responsiveLayout="scroll">
-
-                <p:column headerText="Numéro du compte">
-                    #{acc['accountNumber']}
-                </p:column>
-
-                <p:column headerText="Type">
-                    #{acc['type']}
-                </p:column>
-
-                <p:column headerText="Solde">
-                    #{acc['balance']} CHF
-                </p:column>
-
-                <p:column headerText="Ouvert le">
-                    #{acc['openingDate']}
-                </p:column>
-
-                <p:column headerText="Actions">
-                    <h:form styleClass="be-actions-form">
-
-                        <p:commandButton value="Dépôt"
-                                         styleClass="be-button-small"
-                                         action="deposit?faces-redirect=true">
-                            <f:setPropertyActionListener
-                                    target="#{transactionBean.accountNumber}"
-                                    value="#{acc['accountNumber']}"/>
-                        </p:commandButton>
-
-                        <p:commandButton value="Virement"
-                                         styleClass="be-button-secondary"
-                                         action="transfer?faces-redirect=true">
-                            <f:setPropertyActionListener
-                                    target="#{transactionBean.sourceAccountNumber}"
-                                    value="#{acc['accountNumber']}"/>
-                        </p:commandButton>
-
-                    </h:form>
-                </p:column>
-
-            </p:dataTable>
+            <h:link outcome="createAccount" value="Ouvrir un nouveau compte" style="margin-top:20px;"/>
 
         </div>
     </div>

@@ -20,34 +20,33 @@ public class CreateAccountBean implements Serializable {
     @Inject
     private LoginBean loginBean;
 
-    // Type of account (string corresponding to your AccountType enum)
+    @Inject
+    private AccountViewBean accountViewBean;
+
     private String type;
 
-    // --- getters / setters ---
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
 
     public String open() {
         try {
             String clientId = loginBean.getLoggedClient().getUsername();
             CreateAccountRequest req = new CreateAccountRequest(clientId, type);
             accountService.openAccount(clientId, req);
+
+            // mettre à jour dashboard
+            accountViewBean.refresh();
+
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Compte créé", "Le compte a été ouvert avec succès."));
+                            "Compte créé", "Le compte a bien été ouvert."));
+
             return "dashboard?faces-redirect=true";
 
         } catch (Exception ex) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Erreur lors de la création du compte",
-                            ex.getMessage()));
+                            "Erreur création compte", ex.getMessage()));
             return null;
         }
     }

@@ -23,17 +23,14 @@ public class ClientServiceImpl implements ClientService {
                            String email,
                            String phoneNumber) {
 
-        if (username == null || username.isBlank()) {
+        if (username == null || username.isBlank())
             throw new ApiException(400, "Username is required");
-        }
-        if (password == null || password.isBlank()) {
+
+        if (password == null || password.isBlank())
             throw new ApiException(400, "Password is required");
-        }
 
-        if (store.clients().containsKey(username)) {
+        if (store.clients().containsKey(username))
             throw new ApiException(400, "Username already exists");
-        }
-
 
         Client client = new Client(
                 username,
@@ -44,9 +41,7 @@ public class ClientServiceImpl implements ClientService {
                 phoneNumber
         );
 
-        // Store client
         store.clients().put(username, client);
-
         return client;
     }
 

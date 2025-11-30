@@ -1,10 +1,13 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
+
+<f:metadata>
+    <f:viewParam name="src" value="#{transactionBean.sourceAccountNumber}"/>
+</f:metadata>
 
 <h:head>
     <title>Virement - BankEase</title>
@@ -13,76 +16,47 @@
 
 <h:body class="be-body">
 
-    <!-- NAVBAR -->
     <div class="be-navbar">
         <div class="be-navbar-title">BankEase</div>
-        <div class="be-navbar-right">
-            <span class="be-navbar-user">
-                Bonjour, #{loginBean.loggedClient.firstName}
-            </span>
-            <h:form styleClass="be-logout-form">
-                <h:commandLink value="Se déconnecter" action="#{loginBean.logout}"/>
-            </h:form>
-        </div>
+        <div class="be-navbar-right">Bonjour, #{loginBean.loggedClient.firstName}</div>
     </div>
 
     <div class="be-dashboard">
         <div class="be-dashboard-content">
 
-            <h2>Effectuer un virement</h2>
+            <h2>Virement depuis #{transactionBean.sourceAccountNumber}</h2>
 
             <p:card>
-
                 <h:form>
 
                     <div class="be-field">
-                        <label for="src">Compte source</label>
-                        <p:inputText id="src"
-                                     value="#{transactionBean.sourceAccountNumber}"
-                                     styleClass="be-input"
-                                     readonly="true"/>
-                    </div>
-
-                    <div class="be-field">
-                        <label for="dst">Compte destinataire</label>
-                        <p:inputText id="dst"
+                        <label for="dest">Compte destinataire</label>
+                        <p:inputText id="dest"
                                      value="#{transactionBean.destinationAccountNumber}"
-                                     styleClass="be-input"
-                                     required="true"
-                                     requiredMessage="Le compte destinataire est obligatoire."/>
+                                     required="true"/>
                     </div>
 
                     <div class="be-field">
-                        <label for="amount">Montant (CHF)</label>
+                        <label for="amount">Montant</label>
                         <p:inputNumber id="amount"
                                        value="#{transactionBean.amount}"
-                                       styleClass="be-input"
-                                       decimalPlaces="2"
-                                       minValue="0"
-                                       required="true"
-                                       requiredMessage="Le montant est obligatoire."/>
+                                       required="true"/>
                     </div>
 
                     <div class="be-field">
-                        <label for="desc">Description (optionnel)</label>
+                        <label for="desc">Description</label>
                         <p:inputText id="desc"
-                                     value="#{transactionBean.description}"
-                                     styleClass="be-input"/>
+                                     value="#{transactionBean.description}"/>
                     </div>
 
-                    <p:commandButton value="Confirmer le virement"
+                    <p:commandButton value="Envoyer"
                                      action="#{transactionBean.makeTransfer}"
-                                     styleClass="be-button"
-                                     update="@form"/>
+                                     ajax="false"
+                                     styleClass="be-button"/>
 
-                    <h:link outcome="dashboard"
-                            value="Annuler et retourner au tableau de bord"
-                            style="margin-left: 12px;"/>
+                    <p:messages showSummary="true" styleClass="be-messages"/>
 
-                    <p:messages showSummary="true"
-                                showDetail="false"
-                                styleClass="be-messages"/>
-
+                    <h:link outcome="dashboard" value="Retour"/>
                 </h:form>
             </p:card>
 

@@ -2,16 +2,18 @@ package com.bankease.boundary;
 
 import ch.unil.doplab.bankease.domain.Client;
 import ch.unil.doplab.bankease.service.AccountService;
-import jakarta.enterprise.context.RequestScoped;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 @Named
-@RequestScoped
+@SessionScoped
 public class AccountViewBean implements Serializable {
 
     @Inject
@@ -20,23 +22,33 @@ public class AccountViewBean implements Serializable {
     @Inject
     private LoginBean loginBean;
 
-    // Liste des comptes du client connecté
-    public List<Map<String, Object>> getAccounts() {
-        Client logged = loginBean.getLoggedClient();
-        if (logged == null) {
-            return List.of();
-        }
-        String clientId = logged.getUsername();
-        return accountService.listAccounts(clientId);
+    private List<Map<String, Object>> accounts;
+    private Map<String, Object> summary;
+
+    @PostConstruct
+    public void init() {
+        refresh();
     }
 
-
-    public Map<String, Object> getSummary() {
+    // Recharge toutes les données du dashboard
+    public void refresh() {
         Client logged = loginBean.getLoggedClient();
         if (logged == null) {
-            return Map.of();
+            accounts = Collections.emptyList();
+            summary = Collections.emptyMap();
+            return;
         }
+
         String clientId = logged.getUsername();
-        return accountService.totalBalance(clientId);
+        accounts = accountService.listAccounts(clientId);
+        summary = accountService.totalBalance(clientId);
+    }
+
+    public List<Map<String, Object>> getAccounts() {
+        return accounts;
+    }
+
+    public Map<String, Object> getSummary() {
+        return summary;
     }
 }

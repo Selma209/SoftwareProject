@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
@@ -21,6 +20,7 @@
 
                 <h2 class="be-title">Créer un compte client</h2>
 
+                <!-- FIRST NAME -->
                 <div class="be-field">
                     <label for="firstName">Prénom</label>
                     <p:inputText id="firstName"
@@ -30,7 +30,7 @@
                                  requiredMessage="Prénom obligatoire"/>
                 </div>
 
-
+                <!-- LAST NAME -->
                 <div class="be-field">
                     <label for="lastName">Nom</label>
                     <p:inputText id="lastName"
@@ -40,7 +40,7 @@
                                  requiredMessage="Nom obligatoire"/>
                 </div>
 
-                <!-- Username -->
+                <!-- USERNAME -->
                 <div class="be-field">
                     <label for="username">Nom d'utilisateur</label>
                     <p:inputText id="username"
@@ -49,28 +49,31 @@
                                  required="true"
                                  requiredMessage="Nom d'utilisateur obligatoire"/>
                 </div>
-                <!-- Password -->
+
+                <!-- PASSWORD -->
                 <div class="be-field">
                     <label for="password">Mot de passe</label>
                     <p:password id="password"
                                 value="#{createClientBean.password}"
-                                feedback="false"
                                 styleClass="be-input"
                                 required="true"
                                 requiredMessage="Mot de passe obligatoire"/>
                 </div>
-                <!-- Email -->
+
+                <!-- EMAIL -->
                 <div class="be-field">
                     <label for="email">Email</label>
                     <p:inputText id="email"
                                  value="#{createClientBean.email}"
                                  styleClass="be-input"
-                                 type="email"
                                  required="true"
-                                 requiredMessage="Email obligatoire"/>
+                                 requiredMessage="Email obligatoire"
+                                 validatorMessage="Format d’email invalide">
+                        <f:validateRegex pattern="^[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,6}$"/>
+                    </p:inputText>
                 </div>
 
-                <!-- Phone -->
+                <!-- PHONE -->
                 <div class="be-field">
                     <label for="phone">Téléphone</label>
                     <p:inputText id="phone"
@@ -80,20 +83,18 @@
                                  requiredMessage="Numéro de téléphone obligatoire"/>
                 </div>
 
-                <!-- Password -->
-
-                <!-- Submit -->
+                <!-- SUBMIT -->
                 <p:commandButton value="Créer le compte"
                                  action="#{createClientBean.register}"
-                                 update="@form"
-                                 process="@form"
+                                 ajax="false"
                                  styleClass="be-button"/>
 
+                <!-- MESSAGES -->
                 <p:messages showSummary="true"
                             showDetail="false"
                             styleClass="be-messages"/>
 
-                <!-- Back -->
+                <!-- BACK -->
                 <div class="be-register-link">
                     Déjà un compte ?
                     <h:link outcome="index" value="Se connecter"/>
