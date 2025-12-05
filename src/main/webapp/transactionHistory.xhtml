@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Transaction History</title>
+</h:head>
+
+<h:body class="bankease-body">
+
+    <p:card header="Transaction History">
+
+        <p:dataTable value="#{transactionHistoryBean.recent}" var="tx">
+
+            <p:column headerText="Date">
+                #{tx['timestamp']}
+            </p:column>
+
+            <p:column headerText="Type">
+                #{tx['type']}
+            </p:column>
+
+            <p:column headerText="Amount">
+                #{tx['amount']} CHF
+            </p:column>
+
+            <p:column headerText="Source">
+                #{tx['source']}
+            </p:column>
+
+            <p:column headerText="Destination">
+                #{tx['target']}
+            </p:column>
+
+            <p:column headerText="Status">
+                #{tx['status']}
+            </p:column>
+
+        </p:dataTable>
+
+        <h:link value="Back to Dashboard" outcome="dashboard" />
+
+    </p:card>
+
+</h:body>
+</html>

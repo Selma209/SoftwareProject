@@ -10,9 +10,11 @@ import ch.unil.doplab.bankease.store.InMemoryStore;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class TransactionServiceImpl implements TransactionService {
@@ -100,9 +102,14 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public List<Map<String, Object>> historyByClient(String clientId) {
-        Client c = getClientOr404(clientId);
-        return c.getTransactions().stream().map(this::txToMap).toList();
+        Client client = getClientOr404(clientId);
+
+        return client.getTransactions().stream()
+                .sorted(Comparator.comparing(Transaction::getTimestamp).reversed())
+                .map(this::txToMap)
+                .collect(Collectors.toList());
     }
+
 
     private Map<String, Object> txToMap(Transaction t) {
         String src = (t.getSource() == null) ? "-" : t.getSource().getAccountNumber();

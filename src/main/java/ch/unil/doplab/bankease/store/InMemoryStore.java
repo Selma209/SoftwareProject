@@ -53,7 +53,7 @@ public class InMemoryStore {
 
         Client john = new Client(
                 "john",       // username
-                "1234",               // password
+                "xyz",               // password
                 "John",              // firstName
                 "Doe",               // lastName
                 "john@example.com",  // email
@@ -64,7 +64,7 @@ public class InMemoryStore {
 
         Account johnAcc = john.openAccount(AccountType.CURRENT);
         accounts.put(johnAcc.getAccountNumber(), johnAcc);
-        balances.put(johnAcc.getAccountNumber(), 500.0); // solde initial
+        balances.put(johnAcc.getAccountNumber(), 500.0);
 
         Client mary = new Client(
                 "mary",

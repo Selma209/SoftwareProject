@@ -34,7 +34,6 @@ public class CreateAccountBean implements Serializable {
             CreateAccountRequest req = new CreateAccountRequest(clientId, type);
             accountService.openAccount(clientId, req);
 
-            // mettre à jour dashboard
             accountViewBean.refresh();
 
             FacesContext.getCurrentInstance().addMessage(null,

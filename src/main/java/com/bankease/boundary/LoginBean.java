@@ -47,7 +47,6 @@ public class LoginBean implements Serializable {
         this.loggedClient = loggedClient;
     }
 
-    // === ACTION: LOGIN ===
 
     public String login() {
         FacesContext ctx = FacesContext.getCurrentInstance();

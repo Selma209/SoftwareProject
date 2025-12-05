@@ -54,7 +54,6 @@ public class TransactionBean implements Serializable {
         return (c != null) ? c.getUsername() : null;
     }
 
-    // === DÉPÔT ===
     public String makeDeposit() {
         try {
             String clientId = getClientId();
@@ -77,7 +76,7 @@ public class TransactionBean implements Serializable {
         }
     }
 
-    // === VIREMENT ===
+
     public String makeTransfer() {
         try {
             String clientId = getClientId();

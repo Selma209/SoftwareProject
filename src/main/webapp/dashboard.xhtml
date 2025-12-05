@@ -29,6 +29,11 @@
 
             <h2>Vos comptes</h2>
 
+            <h:link value="View Transaction History"
+                    outcome="transactionHistory"
+                    styleClass="bankease-btn"/>
+
+
             <ui:repeat value="#{accountViewBean.accounts}" var="acc">
 
                 <p:card style="margin-bottom:20px">
@@ -48,6 +53,7 @@
                         <h:link outcome="transfer" value="Virement" styleClass="be-button-secondary">
                             <f:param name="src" value="#{acc['accountNumber']}"/>
                         </h:link>
+
 
                     </div>
 
